@@ -1,3 +1,4 @@
-user1 password1 0 10 10 15 0.666667 0.5
+user1 password1 3 10 10 15 0.666667 0.5
 user2 password2 1 21 21 33 0.636364 0.5
 user3 password3 1 0 0 0 0 0
+user4 password4 0 0 0 0 0 0

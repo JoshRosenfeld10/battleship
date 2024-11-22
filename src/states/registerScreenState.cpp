@@ -80,8 +80,6 @@ void RegisterScreenState::processEvents() {
                         return;
                     }
 
-                    // TODO: condition to check if username is unique
-
                     // If password field doesn't match confirm password field
                     if (m_passwordField.getString() != m_confirmPasswordField.getString()) {
                         playSound("invalidButtonSelect.wav");
@@ -89,12 +87,39 @@ void RegisterScreenState::processEvents() {
                         return;
                     }
 
+                    // Check if username is unique
+                    if (m_stateManager.m_database->checkUsernameExists(m_usernameField.getString())) {
+                        playSound("invalidButtonSelect.wav");
+                        m_errorText.setString("User already exists!");
+                        return;
+                    }
+
                     // If above conditions aren't met
                     playSound("registerButtonSelect.wav");
+
+                    // Load user data into database
+                    m_stateManager.m_database->addBaseUser(
+                        m_usernameField.getString(),
+                        m_passwordField.getString(),
+                        static_cast<IconColour>(0)
+                    );
+                    m_stateManager.m_database->pushToFile();
+
+                    // Create user object 
+                    m_stateManager.m_user = new User(
+                        m_stateManager.m_database, 
+                        m_usernameField.getString(),
+                        m_passwordField.getString(),
+                        static_cast<int>(m_stateManager.m_database->getUserIcon(m_usernameField.getString(), m_passwordField.getString())),
+                        m_stateManager.m_database->getUserTotalWins(m_usernameField.getString(), m_passwordField.getString()),
+                        m_stateManager.m_database->getUserTotalLosses(m_usernameField.getString(), m_passwordField.getString()),
+                        m_stateManager.m_database->getUserTotalGames(m_usernameField.getString(), m_passwordField.getString()),
+                        m_stateManager.m_database->getUserWinRate(m_usernameField.getString(), m_passwordField.getString()),
+                        m_stateManager.m_database->getUserHitPercentage(m_usernameField.getString(), m_passwordField.getString())
+                    );
+
                     std::unique_ptr<State> menuScreenState(new MenuScreenState(m_stateManager, m_window));
                     m_stateManager.changeState(std::move(menuScreenState));
-
-                    // TODO: load user data into database
 
                     return;
                 } else if (!m_errorText.getString().isEmpty()) 

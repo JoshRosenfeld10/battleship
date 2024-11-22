@@ -44,6 +44,7 @@ public:
 
     bool addBaseUser(const std::string &username, const std::string &password, enum IconColour iconColour);
     bool checkUser(const std::string &username, const std::string &password);
+    bool checkUsernameExists(const std::string &username);
 
     bool changeUserIcon(const std::string &username, const std::string &password, enum IconColour iconColour);
     bool changeUserAllStats(const std::string &username, const std::string &password, const int totalWin, const int totalLoss, const int totalGame, const int hits, const int turns);

@@ -95,6 +95,15 @@ bool Database::checkUser(const std::string &username, const std::string &passwor
     return false;
 }
 
+bool Database::checkUsernameExists(const std::string &username) {
+    for (int i = 0; i < usernames.size(); i++) {
+        if (usernames[i] == username) 
+            return true;
+    }
+    
+    return false;
+}
+
 bool Database::addBaseUser(const std::string &username, const std::string &password, enum IconColour iconColour) {
     if (checkUser(username, password)) {
         return false;
