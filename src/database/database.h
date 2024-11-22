@@ -10,8 +10,7 @@ enum class IconColour {
     MAGENTA,
     GREEN,
     YELLOW,
-    CYAN,
-    WHITE
+    CYAN
 };
 
 class DatabaseException {

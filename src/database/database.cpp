@@ -66,7 +66,7 @@ void Database::addContentToFile() {
     }
 
     for (int i = 0; i < usernames.size(); i++) {
-        databaseFile << usernames[i] << " " << passwords[i] << " " << (int)iconColours[i] << " " << (int)totalWins[i] << " " << (int)totalWins[i] << " " << (int)totalGames[i] << " " << winRates[i] << " " << hitPercentages[i] << endl;
+        databaseFile << usernames[i] << " " << passwords[i] << " " << (int)iconColours[i] << " " << (int)totalWins[i] << " " << (int)totalLosses[i] << " " << (int)totalGames[i] << " " << winRates[i] << " " << hitPercentages[i] << endl;
     }
 
     databaseFile.close();
@@ -184,7 +184,7 @@ float Database::getUserHitPercentage(const std::string &username, const std::str
 IconColour Database::getUserIcon(const std::string &username, const std::string &password) {
     int userIndex = findUser(username, password);
     if (userIndex == -1) {
-        return IconColour::WHITE;
+        return IconColour::BLUE;
     }
 
     return iconColours[userIndex];

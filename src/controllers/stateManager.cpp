@@ -2,6 +2,16 @@
 #include <iostream>
 
 StateManager::StateManager() : m_running(true) {
+
+    m_database = new Database();
+    try {
+        m_database->load();
+    } catch(DatabaseException &message) {
+        std::cerr << message.getMessage() << std::endl;
+        return;
+    }
+
+
     std::cout << "StateManager Initialized\n";
 }
 
@@ -12,6 +22,14 @@ StateManager::~StateManager() {
     ResourceManager::clearTextures();
     ResourceManager::clearSoundBuffers();
     ResourceManager::clearFonts();
+
+    delete m_database;
+    m_database = nullptr;
+    
+    if (m_user != nullptr) {
+        delete m_user;
+        m_user = nullptr;
+    }
     
     std::cout << "StateManager Destroyed\n";  
 }
