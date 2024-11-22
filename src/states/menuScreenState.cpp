@@ -3,6 +3,7 @@
 #include "userSettingsScreenState.hpp"
 #include "difficultySelectScreenState.hpp"
 #include "playerTwoLoginScreenState.hpp"
+#include "leaderboardScreenState.hpp"
 
 
 #include <iostream>
@@ -122,6 +123,14 @@ void MenuScreenState::processEvents() {
                     playSound("buttonSelect.wav");
                     std::unique_ptr<State> playerTwoLoginScreenState(new PlayerTwoLoginScreenState(m_stateManager, m_window));
                     m_stateManager.changeState(std::move(playerTwoLoginScreenState));
+                    return;
+                }
+
+                if (event.mouseButton.button == sf::Mouse::Left 
+                 && MenuScreenState::buttons[m_buttonNames::LeaderboardButton]->getButtonState()) {
+                    playSound("buttonSelect.wav");
+                    std::unique_ptr<State> leaderboardScreenState(new LeaderboardScreenState(m_stateManager, m_window));
+                    m_stateManager.changeState(std::move(leaderboardScreenState));
                     return;
                 }
 
