@@ -17,9 +17,9 @@ void User::updateStats(const int& totalWins, const int& totalLosses, const int& 
     m_totalLosses = totalLosses;
     m_totalGames = totalGames;
     m_winPercentage = winPercentage;
-    m_hitPercentage = std::ceil(hits / turns * 100.0) / 100.0;
+    m_hitPercentage = 0;
 
-    m_database->changeUserAllStats(m_username, m_password, m_totalWins, m_totalLosses, m_totalGames, hits, turns);
+    m_database->changeUserAllStats(m_username, m_password, m_totalWins, m_totalLosses, m_totalGames, 0, 0);
     m_database->pushToFile();
 }
 
@@ -33,3 +33,7 @@ void User::updateUserIcon(const int& iconColour) {
 const std::string& User::getUsername() { return m_username; }
 const int& User::getIconColour() { return m_iconColour; }
 const bool& User::getIsGuest() { return m_isGuest; }
+const int& User::getTotalWins() { return m_totalWins; }
+const int& User::getTotalLosses() { return m_totalLosses; }
+const int& User::getTotalGames() { return m_totalGames; }
+const float& User::getWinPercentage() { return m_winPercentage; }

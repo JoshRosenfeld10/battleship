@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <numeric>
 
 using namespace std;
 
@@ -141,7 +143,7 @@ bool Database::changeUserAllStats(const std::string &username, const std::string
     totalLosses[userIndex] = totalLoss;
     totalGames[userIndex] = totalGame;
     winRates[userIndex] = (float)totalWin / (float)totalGame;
-    hitPercentages[userIndex] = (float)hits / (float)turns;
+    hitPercentages[userIndex] = 0;
     return true;
 }
 
@@ -197,4 +199,79 @@ IconColour Database::getUserIcon(const std::string &username, const std::string 
     }
 
     return iconColours[userIndex];
+}
+
+std::vector<std::unordered_map<std::string, std::string>> Database::getLeaderboardStats(
+ const int statIndex, bool isGuest, std::string username) {
+
+    std::vector<std::unordered_map<std::string, std::string>> result;
+    std::vector<int> indices(usernames.size());
+    std::iota(indices.begin(), indices.end(), 0);
+
+    if (statIndex == stats::TotalWins) {
+
+        // Create an index list of top totalWin scores
+        std::sort(indices.begin(), indices.end(),
+                [&](int A, int B) -> bool {
+                        return totalWins[A] > totalWins[B];
+                    });
+    } else if (statIndex == stats::TotalGamesPlayed) {
+
+        // Create an index list of top totalWin scores
+        std::sort(indices.begin(), indices.end(),
+                [&](int A, int B) -> bool {
+                        return totalGames[A] > totalGames[B];
+                    });
+    }
+
+    if (isGuest) {
+        for (int i = 0; i < 5; i++) {
+            std::unordered_map<std::string, std::string> userData;
+
+            userData["username"] = usernames[indices[i]];
+            userData["iconColour"] = std::to_string(static_cast<int>(iconColours[indices[i]]));
+            userData["rankingNumber"] = std::to_string(i + 1);
+
+            if (statIndex == stats::TotalWins) 
+                userData["numberToDisplay"] = std::to_string(totalWins[indices[i]]);
+            if (statIndex == stats::TotalGamesPlayed) 
+                userData["numberToDisplay"] = std::to_string(totalGames[indices[i]]);
+
+            result.push_back(userData);
+        }
+    } else {
+        for (int i = 0; i < 4; i++) {
+            std::unordered_map<std::string, std::string> userData;
+
+            userData["username"] = usernames[indices[i]];
+            userData["iconColour"] = std::to_string(static_cast<int>(iconColours[indices[i]]));
+            userData["rankingNumber"] = std::to_string(i + 1);
+
+            if (statIndex == stats::TotalWins) 
+                userData["numberToDisplay"] = std::to_string(totalWins[indices[i]]);
+            if (statIndex == stats::TotalGamesPlayed) 
+                userData["numberToDisplay"] = std::to_string(totalGames[indices[i]]);
+
+            result.push_back(userData);
+        }
+
+        for (int i = 0; i < indices.size(); i++) {
+            if (usernames[indices[i]] == username) {
+                std::unordered_map<std::string, std::string> userData;
+
+                userData["username"] = usernames[indices[i]];
+                userData["iconColour"] = std::to_string(static_cast<int>(iconColours[indices[i]]));
+                userData["rankingNumber"] = std::to_string(i + 1);
+
+                if (statIndex == stats::TotalWins) 
+                    userData["numberToDisplay"] = std::to_string(totalWins[indices[i]]);
+                if (statIndex == stats::TotalGamesPlayed) 
+                    userData["numberToDisplay"] = std::to_string(totalGames[indices[i]]);
+
+                result.push_back(userData);
+            }
+        }
+    }
+
+    return result;
 }

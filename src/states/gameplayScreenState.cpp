@@ -477,7 +477,16 @@ void GameplayScreenState::shipHitAttempt() {
 
                         // Check for win
                         if (m_blueSank && m_greenSank && m_pinkSank 
-                            && m_orangeSank && m_yellowSank) {
+                         && m_orangeSank && m_yellowSank) {
+                            
+                            // Update stats
+                            m_stateManager.m_user->updateStats(
+                                m_stateManager.m_user->getTotalWins() + 1,
+                                m_stateManager.m_user->getTotalLosses(),
+                                m_stateManager.m_user->getTotalGames() + 1,
+                                (m_stateManager.m_user->getTotalWins() + 1.0) / (m_stateManager.m_user->getTotalGames() + 1.0)
+                            );
+
                             std::unique_ptr<State> gameOverScreenState(
                                 new GameOverScreenState(
                                     m_stateManager, m_window, 
@@ -500,6 +509,15 @@ void GameplayScreenState::shipHitAttempt() {
                 // Run bot's turn
                 if (!m_isMultiplayer && botTurn()) {
                     // If bot wins
+
+                    // Update user stats
+                    m_stateManager.m_user->updateStats(
+                        m_stateManager.m_user->getTotalWins(),
+                        m_stateManager.m_user->getTotalLosses() + 1,
+                        m_stateManager.m_user->getTotalGames() + 1,
+                        m_stateManager.m_user->getTotalWins() / (m_stateManager.m_user->getTotalGames() + 1.0)
+                    );
+
                     std::unique_ptr<State> gameOverScreenState(new GameOverScreenState(
                         m_stateManager, m_window, m_gameOverTextures::YouLose
                     ));

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 enum class IconColour {
     BLUE,
@@ -55,6 +56,14 @@ public:
     float getUserWinRate(const std::string &username, const std::string &password);
     float getUserHitPercentage(const std::string &username, const std::string &password);
     IconColour getUserIcon(const std::string &username, const std::string &password);
+
+
+    enum stats {
+        TotalWins,
+        TotalGamesPlayed
+    };
+    std::vector<std::unordered_map<std::string, std::string>> getLeaderboardStats(
+     const int statIndex, bool isGuest, std::string username = "");
 };
 
 #endif // DATABASE_H

@@ -14,6 +14,9 @@ class UserStatBar {
         
         void render(sf::RenderWindow& window) const;
 
+        void updateInfo(const int& rankingNumber, const int& userIconColour, const std::string& username,
+                        const int& statToDisplay, const int& numberToDisplay);
+
     private:
         sf::Sprite* m_sprite;
         sf::Text* m_rankingNumberText = nullptr;

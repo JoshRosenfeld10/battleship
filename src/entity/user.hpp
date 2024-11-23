@@ -11,13 +11,17 @@ class User {
              const float& hitPercentage);
 
         void updateStats(const int& totalWins, const int& totalLosses, const int& totalGames, 
-                         const float& winPercentage, const int& hits, const int& turns);
+                         const float& winPercentage, const int& hits = 0, const int& turns = 0);
 
         void updateUserIcon(const int& iconColour);
 
         const std::string& getUsername();
         const int& getIconColour();
         const bool& getIsGuest();
+        const int& getTotalWins();
+        const int& getTotalLosses();
+        const int& getTotalGames();
+        const float& getWinPercentage();
 
     private:
         Database* m_database;

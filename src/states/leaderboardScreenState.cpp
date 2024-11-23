@@ -1,5 +1,10 @@
+/*
+ONLY WORKS WHEN THERE'S AT LEAST 5 USERS IN DATABASE TXT FILE
+*/
+
 #include "leaderboardScreenState.hpp"
 #include "menuScreenState.hpp"
+#include "statsScreenState.hpp"
 
 #include <iostream>
 
@@ -42,20 +47,40 @@ LeaderboardScreenState::LeaderboardScreenState(StateManager& stateManager, sf::R
         ));
     }
 
+    // Initialize filter button
+    m_filterButtonRect = new sf::Rect<float>(
+        sf::Vector2f(90*4, 150*4),
+        sf::Vector2f(90*4, 20*4)
+    );
+
+    // Initialize filter text
+    m_filterText = initializeText(
+        m_filterTextOptions[m_currentStatIndex],
+        sf::Vector2f(94*4, 153*4),
+        24*4,
+        sf::Color::Black
+    );
+
     // Initialize user stat bars
+    std::vector<std::unordered_map<std::string, std::string>> leaderboardMap =
+     m_stateManager.m_database->getLeaderboardStats(
+        stats::TotalWins,
+        m_stateManager.m_user->getIsGuest(),
+        !m_stateManager.m_user->getIsGuest() ? m_stateManager.m_user->getUsername() : ""
+    );
     int startWidth = 30 * 4;
     int startHeight = 40 * 4;
     for (int i = 0; i < 5; i++) {
         m_userStatBars.push_back(new UserStatBar(
             sf::Vector2f(startWidth, startHeight + i * (20 * 4)),
             sf::Vector2f(4, 4),
-            i,  // ranking number
-            i,  // user icon colour
-            "testUser",  // username
+            std::stoi(leaderboardMap[i]["rankingNumber"]),  // ranking number
+            std::stoi(leaderboardMap[i]["iconColour"]),  // user icon colour
+            leaderboardMap[i]["username"],  // username
             stats::TotalWins,  // stat to display
-            5,  // number to display
+            std::stoi(leaderboardMap[i]["numberToDisplay"]),  // number to display
             m_window,
-            i == 4 && !m_stateManager.m_user->getIsGuest() ? true : false
+            i == 4 && !m_stateManager.m_user->getIsGuest() ? true : false  // isGuest
         ));
     }
 
@@ -67,16 +92,39 @@ LeaderboardScreenState::~LeaderboardScreenState() {
     cursor.loadFromSystem(sf::Cursor::Arrow);
     m_window.setMouseCursor(cursor);
 
-    deleteUserStatBars();
+    delete m_filterButtonRect;
+    m_filterButtonRect = nullptr;
+    delete m_filterText;
+    m_filterText = nullptr;
 
-    std::cout << "LeaderboardScreenState Destroyed\n";
-}
-
-void LeaderboardScreenState::deleteUserStatBars() {
+    // Delete user stat bars
     for (int i = 0; i < m_userStatBars.size(); i++) {
         delete m_userStatBars[i];
         m_userStatBars[i] = nullptr;
         m_userStatBars.pop_back();
+    }
+
+    std::cout << "LeaderboardScreenState Destroyed\n";
+}
+
+void LeaderboardScreenState::updateUserStatBars(int statIndex) {
+    // Generate unordered_map for stats
+    std::vector<std::unordered_map<std::string, std::string>> leaderboardMap =
+     m_stateManager.m_database->getLeaderboardStats(
+        statIndex,
+        m_stateManager.m_user->getIsGuest(),
+        !m_stateManager.m_user->getIsGuest() ? m_stateManager.m_user->getUsername() : ""
+    );
+
+    // Update stat bars
+    for (int i = 0; i < leaderboardMap.size(); i++) {
+        m_userStatBars[i]->updateInfo(
+            std::stoi(leaderboardMap[i]["rankingNumber"]),
+            std::stoi(leaderboardMap[i]["iconColour"]),
+            leaderboardMap[i]["username"],
+            statIndex,
+            std::stoi(leaderboardMap[i]["numberToDisplay"])
+        );
     }
 }
 
@@ -97,6 +145,39 @@ void LeaderboardScreenState::processEvents() {
                     m_stateManager.changeState(std::move(menuScreenState));
                     return;
                 }
+
+                if (event.mouseButton.button == sf::Mouse::Left
+                 && LeaderboardScreenState::buttons[m_buttonNames::YourStatsButton]->getButtonState()) {
+                    if (m_stateManager.m_user->getIsGuest()) {
+                        playSound("invalidButtonSelect.wav");
+                        return;
+                    }
+                    
+                    playSound("buttonSelect.wav");
+                    std::unique_ptr<State> statsScreenState(new StatsScreenState(m_stateManager, m_window));
+                    m_stateManager.changeState(std::move(statsScreenState));
+                    return;
+                }
+
+                if (event.mouseButton.button == sf::Mouse::Left && m_filterButtonHovered) {
+                    playSound("buttonSelect.wav");
+                    
+                    // Update stat index
+                    if (m_currentStatIndex == 1)
+                        m_currentStatIndex = 0;
+                    else {
+                        m_currentStatIndex++;
+                    }
+
+                    // Update filter text
+                    m_filterText->setString(m_filterTextOptions[m_currentStatIndex]);
+                    
+                    // Update stat bars
+                    updateUserStatBars(m_currentStatIndex);
+
+                    return;
+                }
+
                 return;
             }
             default:
@@ -109,6 +190,12 @@ void LeaderboardScreenState::update() {
     sf::Vector2f mousePosition = LeaderboardScreenState::getMousePosition();
     buttons[m_buttonNames::BackButton]->updateButtonState(mousePosition);
     buttons[m_buttonNames::YourStatsButton]->updateButtonState(mousePosition);
+
+    if (m_filterButtonRect->contains(mousePosition) && !m_filterButtonHovered) 
+        m_filterButtonHovered = true;
+    if (!m_filterButtonRect->contains(mousePosition) && m_filterButtonHovered) 
+        m_filterButtonHovered = false;
+    
 }
 
 void LeaderboardScreenState::draw() {
@@ -123,6 +210,8 @@ void LeaderboardScreenState::draw() {
     for (UserStatBar* userStatBar : LeaderboardScreenState::m_userStatBars) {
         userStatBar->render(m_window);
     }
+
+    m_window.draw(*m_filterText);
 
     m_window.display();
 }

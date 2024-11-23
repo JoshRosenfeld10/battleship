@@ -16,9 +16,17 @@ class LeaderboardScreenState : public State {
         static std::vector<sf::Sprite*> sprites;
         static std::vector<Button*> buttons;
         std::vector<UserStatBar*> m_userStatBars;
+        int m_currentStatIndex = 0;
+        sf::Rect<float>* m_filterButtonRect;
+        bool m_filterButtonHovered = false;
+        sf::Text* m_filterText;
 
-        void updateUserStatBars(std::vector<std::unordered_map<std::string, std::string>>);
-        void deleteUserStatBars();
+        std::string m_filterTextOptions[2] = {
+            "Total Wins",
+            "Total Games"
+        };
+
+        void updateUserStatBars(int statIndex);
 
         std::vector<std::string> m_texturePaths{
             "LeaderboardScreen/leaderboardBackground.png",

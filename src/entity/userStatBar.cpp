@@ -65,10 +65,6 @@ UserStatBar::UserStatBar(const sf::Vector2f& positionVector, const sf::Vector2f&
         m_iconColours[userIconColour]
     );
 
-
-
-
-
 }
 
 UserStatBar::~UserStatBar() {
@@ -85,6 +81,16 @@ UserStatBar::~UserStatBar() {
     delete m_userIcon;
     m_userIcon = nullptr;
 }
+
+void UserStatBar::updateInfo(const int& rankingNumber, const int& userIconColour, const std::string& username,
+ const int& statToDisplay, const int& numberToDisplay) {
+    m_rankingNumberText->setString(std::to_string(rankingNumber) + ".");
+    m_userIcon->setFillColor(m_iconColours[userIconColour]);
+    m_usernameText->setString(username);
+    m_statText->setString(m_textToDisplay[statToDisplay]);
+    m_numberToDisplayText->setString(std::to_string(numberToDisplay));
+    m_numberToDisplayText->setFillColor(m_iconColours[userIconColour]);
+ }
 
 void UserStatBar::render(sf::RenderWindow& window) const {
     window.draw(*m_sprite);
