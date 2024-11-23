@@ -9,7 +9,7 @@ std::vector<sf::Sprite*> UserSettingsScreenState::sprites;
 std::vector<Button*> UserSettingsScreenState::buttons;
 
 UserSettingsScreenState::UserSettingsScreenState(StateManager& stateManager, sf::RenderWindow& window)
-: State( stateManager, window ) {
+: State( stateManager, window ), m_iconColourIndex(m_stateManager.m_user->getIconColour()) {
     
     m_usernameText = *initializeText(
         "User Settings",
@@ -20,7 +20,7 @@ UserSettingsScreenState::UserSettingsScreenState(StateManager& stateManager, sf:
     m_userIcon = *initializeUserIcon(
         sf::Vector2f(150*4, 80*4), 
         40, 
-        m_iconColours[m_iconColourIndex]  // TODO: change this colour to the user's "icon colour"
+        m_iconColours[m_iconColourIndex] 
     );
 
     // Initialize sprites if not already initialized
@@ -98,12 +98,14 @@ sf::Color UserSettingsScreenState::getPreviousColour() {
 }
 
 void UserSettingsScreenState::changeIconColour(sf::CircleShape& userIcon, bool rightButton) {
-    // TODO: actual change the user database to reflect a user changing their icon colour
     if (rightButton) {
         userIcon.setFillColor(getNextColour());
     } else {
         userIcon.setFillColor(getPreviousColour());
     }
+
+    // Load icon colour to database
+    m_stateManager.m_user->updateUserIcon(m_iconColourIndex);
 }
 
 void UserSettingsScreenState::processEvents() {
@@ -115,7 +117,6 @@ void UserSettingsScreenState::processEvents() {
                 m_stateManager.quit();
                 break;
 
-            // TODO: add functionality to buttons
             case sf::Event::MouseButtonReleased: {
                 if (event.mouseButton.button == sf::Mouse::Left && buttons[m_buttonNames::BackButton]->getButtonState()) {
                     playSound("buttonSelect.wav");
@@ -124,6 +125,11 @@ void UserSettingsScreenState::processEvents() {
                 }
                 if (event.mouseButton.button == sf::Mouse::Left && buttons[m_buttonNames::LogoutButton]->getButtonState()) {
                     playSound("logoutButtonSelect.wav");
+
+                    // Destroy User object when the user logs out
+                    delete m_stateManager.m_user;
+                    m_stateManager.m_user = nullptr;
+
                     std::unique_ptr<State> loginScreenState(new LoginScreenState(m_stateManager, m_window));
                     m_stateManager.changeState(std::move(loginScreenState));
                 }

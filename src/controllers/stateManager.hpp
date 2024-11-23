@@ -1,5 +1,7 @@
 #pragma once
 #include "state.hpp"
+#include "../database/database.h"
+#include "../entity/user.hpp"
 #include <stack>
 #include <memory>
 
@@ -21,6 +23,8 @@ class StateManager {
         bool running() { return m_running; }
         void quit() { m_running = false; }
 
+        Database* m_database;
+        User* m_user = nullptr;
 
     private:
         std::stack<std::unique_ptr<State>> m_states;

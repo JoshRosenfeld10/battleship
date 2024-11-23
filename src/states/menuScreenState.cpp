@@ -3,6 +3,7 @@
 #include "userSettingsScreenState.hpp"
 #include "difficultySelectScreenState.hpp"
 #include "playerTwoLoginScreenState.hpp"
+#include "leaderboardScreenState.hpp"
 
 
 #include <iostream>
@@ -13,17 +14,19 @@ std::vector<Button*> MenuScreenState::buttons;
 MenuScreenState::MenuScreenState(StateManager& stateManager, sf::RenderWindow& window)
 : State( stateManager, window ) {
     
-    // TODO: change the username text and username icon colour to reflect the actual user
+    // Initialize username text
     m_usernameText = *initializeText(
-        "TestUser",  // change this to the current user's username
+        m_stateManager.m_user->getUsername(),
         sf::Vector2f(25*4, 4*4), 
         20 * 4, 
         sf::Color::White
     );
+
+    // Initialize user icon colour
     m_userIcon = *initializeUserIcon(
         sf::Vector2f(m_usernameText.getGlobalBounds().left, 25) + sf::Vector2f(m_usernameText.getGlobalBounds().width + 15, 0), 
         15, 
-        sf::Color::Blue  // change this colour to the user's "icon colour"
+        m_iconColours[m_stateManager.m_user->getIconColour()]
     );
 
     // Initialize sprites if not already initialized
@@ -91,9 +94,16 @@ void MenuScreenState::processEvents() {
 
             // TODO: add functionality to buttons
             case sf::Event::MouseButtonReleased: {
-                // TODO: make it so you can't access user settings page if logged in as guest
+
                 if (event.mouseButton.button == sf::Mouse::Left 
                  && MenuScreenState::buttons[m_buttonNames::UserSettingsButton]->getButtonState()) {
+                    
+                    // Can't access user settings page if logged in as guest
+                    if (m_stateManager.m_user->getIsGuest()) {
+                        playSound("invalidButtonSelect.wav");
+                        return;
+                    }
+
                     playSound("buttonSelect.wav");
                     std::unique_ptr<State> userSettingsScreenState(new UserSettingsScreenState(m_stateManager, m_window));
                     m_stateManager.changeState(std::move(userSettingsScreenState));
@@ -113,6 +123,14 @@ void MenuScreenState::processEvents() {
                     playSound("buttonSelect.wav");
                     std::unique_ptr<State> playerTwoLoginScreenState(new PlayerTwoLoginScreenState(m_stateManager, m_window));
                     m_stateManager.changeState(std::move(playerTwoLoginScreenState));
+                    return;
+                }
+
+                if (event.mouseButton.button == sf::Mouse::Left 
+                 && MenuScreenState::buttons[m_buttonNames::LeaderboardButton]->getButtonState()) {
+                    playSound("buttonSelect.wav");
+                    std::unique_ptr<State> leaderboardScreenState(new LeaderboardScreenState(m_stateManager, m_window));
+                    m_stateManager.changeState(std::move(leaderboardScreenState));
                     return;
                 }
 

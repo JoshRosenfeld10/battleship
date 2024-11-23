@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 enum class IconColour {
     BLUE,
@@ -10,8 +11,7 @@ enum class IconColour {
     MAGENTA,
     GREEN,
     YELLOW,
-    CYAN,
-    WHITE
+    CYAN
 };
 
 class DatabaseException {
@@ -45,6 +45,7 @@ public:
 
     bool addBaseUser(const std::string &username, const std::string &password, enum IconColour iconColour);
     bool checkUser(const std::string &username, const std::string &password);
+    bool checkUsernameExists(const std::string &username);
 
     bool changeUserIcon(const std::string &username, const std::string &password, enum IconColour iconColour);
     bool changeUserAllStats(const std::string &username, const std::string &password, const int totalWin, const int totalLoss, const int totalGame, const int hits, const int turns);
@@ -55,6 +56,14 @@ public:
     float getUserWinRate(const std::string &username, const std::string &password);
     float getUserHitPercentage(const std::string &username, const std::string &password);
     IconColour getUserIcon(const std::string &username, const std::string &password);
+
+
+    enum stats {
+        TotalWins,
+        TotalGamesPlayed
+    };
+    std::vector<std::unordered_map<std::string, std::string>> getLeaderboardStats(
+     const int statIndex, bool isGuest, std::string username = "");
 };
 
 #endif // DATABASE_H

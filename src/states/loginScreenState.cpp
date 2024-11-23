@@ -88,20 +88,43 @@ void LoginScreenState::processEvents() {
                         return;
                     }
 
-                    // TODO: condition to check if username and password match user data in database
+                    // If username and password don't match any users in database
+                    if (!m_stateManager.m_database->checkUser(m_usernameField.getString(), m_passwordField.getString())) {
+                        playSound("invalidButtonSelect.wav");
+                        m_errorText.setString("Incorrect credentials!");
+                        return;
+                    }
 
                     // If above conditions are not met
                     playSound("buttonSelect.wav");
+
+                    // Create user object 
+                    m_stateManager.m_user = new User(
+                        m_stateManager.m_database, 
+                        m_usernameField.getString(),
+                        m_passwordField.getString(),
+                        static_cast<int>(m_stateManager.m_database->getUserIcon(m_usernameField.getString(), m_passwordField.getString())),
+                        m_stateManager.m_database->getUserTotalWins(m_usernameField.getString(), m_passwordField.getString()),
+                        m_stateManager.m_database->getUserTotalLosses(m_usernameField.getString(), m_passwordField.getString()),
+                        m_stateManager.m_database->getUserTotalGames(m_usernameField.getString(), m_passwordField.getString()),
+                        m_stateManager.m_database->getUserWinRate(m_usernameField.getString(), m_passwordField.getString()),
+                        m_stateManager.m_database->getUserHitPercentage(m_usernameField.getString(), m_passwordField.getString())
+                    );
+
                     std::unique_ptr<State> menuScreenState(new MenuScreenState(m_stateManager, m_window));
                     m_stateManager.changeState(std::move(menuScreenState));
                     return;
                 } else if (!m_errorText.getString().isEmpty()) 
                     m_errorText.setString("");
 
-                // TODO: pass data as guest
+                // If guest button is left clicked
                 if (event.mouseButton.button == sf::Mouse::Left
                 && LoginScreenState::buttons[m_buttonNames::GuestButton]->getButtonState()) {
                     playSound("buttonSelect.wav");
+
+                    // Create guest user
+                    m_stateManager.m_user = new User(m_stateManager.m_database);
+
                     std::unique_ptr<State> menuScreenState(new MenuScreenState(m_stateManager, m_window));
                     m_stateManager.changeState(std::move(menuScreenState));
                     return;
