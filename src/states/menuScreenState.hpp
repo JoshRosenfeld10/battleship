@@ -13,8 +13,8 @@ class MenuScreenState : public State {
     private:
         static std::vector<sf::Sprite*> sprites;
         static std::vector<Button*> buttons;
-        sf::Text m_usernameText;
-        sf::CircleShape m_userIcon;
+        sf::Text* m_usernameText;
+        sf::CircleShape* m_userIcon;
         sf::Color m_iconColours[6] = {
             sf::Color::Blue,
             sf::Color::Red,
@@ -33,7 +33,9 @@ class MenuScreenState : public State {
             "MenuScreen/leaderboardButtonIdle.png",
             "MenuScreen/leaderboardButtonActive.png",
             "MenuScreen/userSettingsButtonIdle.png",
-            "MenuScreen/userSettingsButtonActive.png"
+            "MenuScreen/userSettingsButtonActive.png",
+            "UserSettingsScreen/logoutButtonIdle.png",
+            "UserSettingsScreen/logoutButtonActive.png",
         };
         
         enum m_textureNames {
@@ -45,7 +47,9 @@ class MenuScreenState : public State {
             LeaderboardButtonIdleTexture,
             LeaderboardButtonActiveTexture,
             UserSettingsButtonIdleTexture,
-            UserSettingsButtonActiveTexture
+            UserSettingsButtonActiveTexture,
+            LogoutButtonIdleTexture,
+            LogoutButtonActiveTexture
         };
 
         enum m_spriteNames {
@@ -56,6 +60,7 @@ class MenuScreenState : public State {
             PlayVsBotButton,
             PassAndPlayButton,
             LeaderboardButton,
-            UserSettingsButton
+            UserSettingsButton,
+            LogoutButton
         };
 };

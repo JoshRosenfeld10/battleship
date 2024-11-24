@@ -4,7 +4,6 @@ Button::Button(const sf::Vector2f& positionVector, const sf::Vector2f& scaleVect
                const sf::Texture& idleTexture, const sf::Texture& activeTexture, sf::RenderWindow& window) 
                : m_window{ window } {
     
-    this->active = false;
     this->m_idleTexture = &idleTexture;
     this->m_activeTexture = &activeTexture;
 

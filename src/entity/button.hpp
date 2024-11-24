@@ -19,5 +19,5 @@ class Button {
         sf::Sprite* m_sprite;
         sf::RenderWindow& m_window;
 
-        bool active;
+        bool active = false;
 };
